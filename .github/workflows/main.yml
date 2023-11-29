@@ -25,14 +25,14 @@ jobs:
         name: Build and test
         uses: docker/build-push-action@v5
         with:
-          context: ThreadingWithDocker
+          context: ./ThreadingWithDocker
           target: build
           load: true
       -
         name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ThreadingWithDocker
+          context: ./ThreadingWithDocker
           push: true
           target: final
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
