@@ -30,3 +30,9 @@ When done, the contents of the file would look something like this:
 0, 0, 10:00:00.000
 1, 101, 10:00:00.001
 2, 132, 10:00:00.013
+
+docker run -i -v c:\junk:/log <image_name>
+Note command format when run from bash shell must be in either of the two following formats:
+docker run -i -v c:\\junk:/log pvoulgaris9398/threading-example
+OR
+docker run -i -v c:/junk:/log pvoulgaris9398/threading-example
