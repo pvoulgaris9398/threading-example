@@ -1,4 +1,5 @@
-﻿namespace ThreadingWithDocker
+﻿using System.IO;
+namespace ThreadingWithDocker
 {
     internal class Test3
     {
@@ -21,6 +22,7 @@
         {
 
             //1. Open the file, handle errors as appropriate
+            File.WriteAllText("/log/out.txt", "test123");
 
             //2. Write the first entry
             Write(0, DateTime.Now);
