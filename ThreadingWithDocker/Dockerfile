@@ -4,6 +4,8 @@ WORKDIR /ThreadingWithDocker
 # Copy everything
 COPY . ./
 
+VOLUME ["/var/log/"]
+
 # Restore as distinct layers
 RUN dotnet restore
 
