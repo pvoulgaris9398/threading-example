@@ -1,37 +1,89 @@
-﻿
-namespace ThreadingWithDocker
+﻿namespace ThreadingWithDocker
 {
     internal class ThreadManager
     {
         private ILogWriter LogWriter { get;}
-        public ThreadManager(ILogWriter writer)
+        public int NumberOfThreads { get; }
+        public int NumberOfIterationsPerThread { get; }
+        protected Action<string> LogMessageCallback { get; }
+        protected Action<string> LogErrorCallback { get; }
+
+        private static Action<ManualResetEvent, EventWaitHandle, int, ILogWriter, Action<string>> ThreadFunction
+            = (threadStartEvent, threadCompletedEvent, numberOfIterationsPerThread, logWriter, logErrorCallback)
+            =>
         {
+            try
+            {
+                threadStartEvent.WaitOne();
+                foreach (var k in Enumerable.Range(0, numberOfIterationsPerThread))
+                {
+                    logWriter.Write(Thread.CurrentThread.ManagedThreadId, DateTime.Now);
+                }
+            }
+            catch (Exception ex)
+            {
+                logErrorCallback(ex.ToString());
+            }
+            finally
+            {
+                threadCompletedEvent.Set();
+            }
+        };
+
+        public ThreadManager(
+            int numberOfThreads,
+            int numberOfIterationsPerThread,
+            ILogWriter writer,
+            Action<string> logMessageCallback,
+            Action<string> logErrorCallback)
+        {
+            NumberOfThreads = numberOfThreads;
+            NumberOfIterationsPerThread = numberOfIterationsPerThread;
             LogWriter = writer;
+            LogMessageCallback = logMessageCallback;
+            LogErrorCallback = logErrorCallback;
         }
 
-        //TODO: Get from Config, abstract the thread function, etc.
         public void Run()
         {
-            //3. Create threads, handles, etc. and kick them off
-            int numOfThreads = 10;
-            WaitHandle[] waitHandles = new WaitHandle[numOfThreads];
+            WaitHandle[] waitHandles = new WaitHandle[NumberOfThreads];
             var threadStartEvent = new ManualResetEvent(false);
-
-            for (int i = 0; i < numOfThreads; i++)
+            
+            for (int i = 0; i < NumberOfThreads; i++)
             {
                 var j = i;
 
                 var threadCompletedEvent = new EventWaitHandle(false, EventResetMode.ManualReset);
 
-                var thread = new Thread(() =>
+                var thread = new Thread(
+                    () => ThreadFunction(
+                        threadStartEvent,
+                        threadCompletedEvent,
+                        NumberOfIterationsPerThread,
+                        LogWriter,
+                        LogErrorCallback));
+                    /*
+                    () =>
                 {
-                    threadStartEvent.WaitOne();
-                    foreach (var k in Enumerable.Range(0, 10))
+                    try
                     {
-                        LogWriter.Write(Thread.CurrentThread.ManagedThreadId, DateTime.Now);
+                        threadStartEvent.WaitOne();
+                        foreach (var k in Enumerable.Range(0, NumberOfIterationsPerThread))
+                        {
+                            LogWriter.Write(Thread.CurrentThread.ManagedThreadId, DateTime.Now);
+                        }
                     }
-                    threadCompletedEvent.Set();
-                });
+                    catch (Exception ex)
+                    {
+                        LogErrorCallback(ex.ToString());
+                    }
+                    finally
+                    {
+                        threadCompletedEvent.Set();
+                    }
+                }
+                */
+                
                 thread.Name = string.Format("Thread{0}", i);
                 waitHandles[j] = threadCompletedEvent;
                 thread.Start();

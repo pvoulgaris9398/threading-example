@@ -12,13 +12,6 @@
 
         public void Write(int threadId, DateTime timeStamp)
         {
-            /*TODO: 
-             * Handle errors...
-             * Perhaps try to create the directory if it doesn't exist?
-             * Overwrite existing file if or delete existing file first?
-             * Handle running from Windows Console App and Docker container gracefully
-             * 
-             */
             lock (_synchLock)
             {
                 RowNumber++;

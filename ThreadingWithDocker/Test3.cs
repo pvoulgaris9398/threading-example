@@ -29,7 +29,7 @@ namespace ThreadingWithDocker
 
             writer.Write(0, DateTime.Now);
 
-            ThreadManager manager = new ThreadManager(writer);
+            ThreadManager manager = new ThreadManager(10, 10, writer, s => { }, e => { });
 
             manager.Run();         
         }
