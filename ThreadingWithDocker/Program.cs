@@ -8,9 +8,6 @@ namespace ThreadingWithDocker
         {
             lock (_logErrorCallbackLockObject)
             {
-                {
-
-                }
                 var original = Console.ForegroundColor;
                 try
                 {
@@ -36,7 +33,7 @@ namespace ThreadingWithDocker
 
         private static void Main(string[] args)
         {
-            // TODO: Use structure logging framework here instead of the log callback implementation(s).
+            // TODO: Use structure logging framework here instead of the log callback implementation
             try
             {
                 var app = new App(LogMessage, LogError);

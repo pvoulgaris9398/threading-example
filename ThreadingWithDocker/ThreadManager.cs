@@ -46,14 +46,13 @@
 
         public void Run()
         {
-            WaitHandle[] waitHandles = new WaitHandle[NumberOfThreads];
+            var waitHandles = new List<EventWaitHandle>();
             var threadStartEvent = new ManualResetEvent(false);
-            
-            for (int i = 0; i < NumberOfThreads; i++)
-            {
-                var j = i;
 
+            foreach (var index in Enumerable.Range(0, NumberOfThreads))
+            {
                 var threadCompletedEvent = new EventWaitHandle(false, EventResetMode.ManualReset);
+                waitHandles.Add(threadCompletedEvent);
 
                 var thread = new Thread(
                     () => ThreadFunction(
@@ -62,35 +61,13 @@
                         NumberOfIterationsPerThread,
                         LogWriter,
                         LogErrorCallback));
-                    /*
-                    () =>
-                {
-                    try
-                    {
-                        threadStartEvent.WaitOne();
-                        foreach (var k in Enumerable.Range(0, NumberOfIterationsPerThread))
-                        {
-                            LogWriter.Write(Thread.CurrentThread.ManagedThreadId, DateTime.Now);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogErrorCallback(ex.ToString());
-                    }
-                    finally
-                    {
-                        threadCompletedEvent.Set();
-                    }
-                }
-                */
-                
-                thread.Name = string.Format("Thread{0}", i);
-                waitHandles[j] = threadCompletedEvent;
-                thread.Start();
 
+                thread.Name = string.Format("Thread{0}", index);
+                thread.Start();
             }
+          
             threadStartEvent.Set();
-            WaitHandle.WaitAll(waitHandles);
+            WaitHandle.WaitAll(waitHandles.ToArray());
         }
     }
 }

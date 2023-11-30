@@ -3,7 +3,7 @@
     internal class FileLogWriter : ILogWriter
     {
         private int RowNumber { get; set; } = -1;
-        private static object _synchLock = new object();
+        private object _synchLock = new object();
         private string LogFilePath { get; }
         public FileLogWriter(string logFilePath)
         {
